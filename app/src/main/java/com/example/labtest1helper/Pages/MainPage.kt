@@ -3,6 +3,7 @@ package com.example.labtest1helper.Pages
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.View
+import android.widget.Button
 import android.widget.DatePicker
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +50,10 @@ class MainPage {
         @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
         @Composable
         fun page() {
+            //IMPORTANT REMEMBER STATE STUFF
             var text by remember {mutableStateOf("Click a button")}
+            var showModal by remember { mutableStateOf(false) }
+
 
             val ic = WindowCompat.getInsetsController((LocalView.current.context as Activity).window, LocalView.current)
             ic.apply {
@@ -127,17 +131,19 @@ class MainPage {
                         contentDescription = "Logo"
                     )
                     Button(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            DatePickerModalInput(
-                                onDateSelected = {date ->
-                                    text = date
-                                },
-                                onDismiss = {}
-                            ) { }
-                        }
+                        onClick = {showModal = true},
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Text("Date picker")
+                    }
+                    if (showModal) {
+                        DatePickerModal(
+                            onDateSelected = { data ->
+                                text = data.toString()
+                                showModal = false
+                            },
+                            onDismiss = {showModal = false}
+                        )
                     }
                 }
             }
@@ -147,11 +153,11 @@ class MainPage {
         //DATE PICKER
         @OptIn(ExperimentalMaterial3Api::class)
         @Composable
-        fun DatePickerModalInput(
+        fun DatePickerModal(
             onDateSelected: (Long?) -> Unit,
             onDismiss: () -> Unit
         ) {
-            val datePickerState = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+            val datePickerState = rememberDatePickerState()
 
             DatePickerDialog(
                 onDismissRequest = onDismiss,
